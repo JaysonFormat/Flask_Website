@@ -6,3 +6,4 @@
 # 'sudo ufw allow http/tcp'
 # gunicorn --workers=3 run:app'
 # Don't forget to change the file size accepted in nginx
+# Don't Forger to change the timezone in linux Asia/Manila
