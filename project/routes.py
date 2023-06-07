@@ -617,7 +617,7 @@ def customer_search():
         users = User.query.filter_by(role='Customer').order_by(User.date_join.desc()).paginate(page=page, per_page=5)
 
     # Render the template with the users data and the form
-    return render_template('usermanagement.html', users=users, form=form)
+    return render_template('usermanagement.html',title=Customer Management, users=users, form=form)
 
 
 @app.route('/appointment_search', methods=['GET', 'POST'])
@@ -643,7 +643,7 @@ def appointment_search():
         appointments = Book_date.query.order_by(Book_date.book_id.desc()).paginate(page=page, per_page=5)
 
         # Render the template with the appointments data and the form
-        return render_template('appointment_management.html', appointments=appointments, form=form)
+        return render_template('appointment_management.html',Appointment Management, appointments=appointments, form=form)
 
 
 @app.route('/inventory', methods=['GET','POST'])
@@ -673,7 +673,7 @@ def inventory_create():
 
         flash('Successfully added', 'success')
         return redirect(url_for('inventory'))
-    return render_template('inventory_create.html', form=form)
+    return render_template('inventory_create.html',title='Inventory', form=form)
 
 @app.route('/inventory_edit/<int:inventory_id>', methods=['GET', 'POST'])
 @login_required
@@ -719,7 +719,7 @@ def download_inventory():
     ws = wb.active
 
     # Add headers to the worksheet
-    ws.append(['Product', 'Category', 'Price', 'Stock'])
+    ws.append(['Product', 'Category', 'Price', 'Stock','Expiration Date'])
 
     # Set the width of each column
     for col_index in range(1, 5):
@@ -731,7 +731,7 @@ def download_inventory():
 
     # Add data to the worksheet
     for item in inventory:
-        ws.append([item.product, item.category, item.price, item.stock])
+        ws.append([item.product, item.category, item.price, item.stock, item.expiration_date])
 
     # Save the workbook to a BytesIO object
     output = io.BytesIO()
@@ -781,7 +781,7 @@ def inventory_search():
         page = request.args.get('page', 1, type=int)
         inventory = Inventory.query.order_by(Inventory.id.desc()).paginate(page=page, per_page=5)
 
-    return render_template('inventory_management.html', inventory=inventory, form=form)
+    return render_template('inventory_management.html',title='Inventory', inventory=inventory, form=form)
 
 @app.route('/account_admin/', methods=['GET', 'POST'])  # account admin PAGE
 @login_required
@@ -977,7 +977,7 @@ def employee_search():
         users = User.query.filter(User.role.in_(['Super_admin', 'Staff', 'Admin'])).order_by(User.date_join.desc()).paginate(page=page, per_page=5)
 
 
-    return render_template('employee_management.html', users=users, form=form)
+    return render_template('employee_management.html',title='Employee Management', users=users, form=form)
 
 
 @app.route('/employee_account/<int:user_id>', methods=['GET', 'POST'])
@@ -1026,7 +1026,7 @@ def employee_account(user_id):
         form.address.data = user.address
         form.barcode.data = user.barcode_id
 
-    return render_template('employee_account.html', form=form, user_id=user_id, user=user, employee=employee)
+    return render_template('employee_account.html',title='Account', form=form, user_id=user_id, user=user, employee=employee)
 
 
 @app.route('/download_document/<path:file_pdf>', methods=['GET', 'POST'])
@@ -1132,7 +1132,7 @@ def payment_search():
         payments = Book_date.query.order_by(Book_date.book_id.desc()).paginate(page=page, per_page=5)
 
         # Render the template with the paymentss data and the form
-        return render_template('payments.html', payments=payments, form=form)
+        return render_template('payments.html', title='Payments' , payments=payments, form=form)
 
 
 @app.route('/download_payments', methods=['GET','POST'])
