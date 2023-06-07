@@ -1234,42 +1234,6 @@ def time_in():
     print(form.errors)
     return redirect(url_for('attendance'))
 
-# @app.route('/time-out', methods=['POST'])
-# def time_out():
-#     form = TimeOutForm()
-
-#     if form.validate_on_submit():
-#         barcode = form.barcode.data
-
-#         user = User.query.filter_by(barcode_id=barcode).first()  # Check if the user exists based on the barcode attribute name
-
-#         if user is not None:
-#             attendance = Attendance.query.filter_by(user_id=user.user_id, time_out=None).first()
-#             if attendance:
-#                 time_out = datetime.now()
-#                 attendance.time_out = time_out
-
-#                 # Calculate the duration between time in and time out
-#                 duration = time_out - attendance.time_in
-
-#                 # Calculate the total hours of work
-#                 total_hours = duration.total_seconds() // 3600
-
-#                 # Calculate the overtime hours
-#                 overtime_hours = max(duration - timedelta(hours=8), timedelta())
-
-#                 attendance.total_hours = total_hours
-#                 attendance.overtime_hours = overtime_hours.total_seconds()
-
-#                 db.session.commit()
-#                 flash('Employee Time Out', 'success')
-#             else:
-#                 flash('No active time-in record found for this user', 'danger')
-#         else:
-#             flash('Invalid Barcode ID', 'danger')  # Flash an error message if the user does not exist
-
-#     return redirect(url_for('attendance'))
-
 
 @app.route('/time-out', methods=['POST'])
 def time_out():
