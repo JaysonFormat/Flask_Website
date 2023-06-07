@@ -1,0 +1,84 @@
+{% extends "admindashboard.html" %}
+
+{% block content %}
+<div class="mt-4">
+	<h1 class="ms-3" ><strong>DASHBOARD &#x1F4C8 </strong></h1>
+	<div class="row justify-content-center">
+		<div class="box1 ms-4 position-relative">
+			<i class="fa-solid fa-users fa-2xl position-absolute top-0 end-0 mt-4 me-2"></i>
+			<h3><strong>Customer</strong></h3>
+			<h5> Number of Users: {{ num_users }}</h5>
+			<h5> Activate: {{ num_activate }} </h5>
+			<h5> Deactivate: {{ num_deactivate }} </h5>
+		</div>
+		<div class="box2 ms-3 position-relative">
+			<i class="fa-regular fa-calendar-check fa-2xl position-absolute top-0 end-0 mt-4 me-2"></i>
+			<h3><strong>Appointment</strong></h3>
+			<h5>Ongoing appointments: {{ num_appointment }}</h5>
+		</div>
+		<div class="box3 ms-3 position-relative">
+			<i class="fa-regular fa-building fa-2xl position-absolute top-0 end-0 mt-4 me-2"></i>
+			<h3><strong>Employee</strong></h3>
+			<h5>Number of Employees: {{ num_employee }}</h5>
+			<h5>Activate: {{ emp_activate }}</h5>
+			<h5>Deactivate: {{ emp_deactivate }}</h5>
+		</div>
+		<div class="box4 ms-3 position-relative">
+			<i class="fa-solid fa-boxes-stacked fa-2xl position-absolute top-0 end-0 mt-4 me-2"></i>
+			<h3><strong>Inventory</strong></h3>
+			<h5>Number of Products: {{ num_products }}</h5>
+		</div>
+	</div>
+</div>
+
+<div class="row text-center">
+<div class="col">
+    <div class="d-flex flex-column justify-content-evenly">
+        <h1 class="mt-5 ms-3"><strong>ALERTS &#x2757;</strong></h1>
+        {% for product in low_stock_products %}
+            <div class=" align-self-center alerts mt-2 ">
+                <p><strong>Low stock alert for {{ product.product }}: only {{ product.stock }} left</strong></p>
+            </div>
+        {% endfor %}
+        {% for product in upcoming_expiry_products %}
+            {% if product.expiration_date.date() <= today %}
+                <div class="align-self-center alerts mt-2">
+                    <p><strong>Expiration date alert for {{ product.product }}: expiring on {{ product.expiration_date.strftime('%B %d, %Y') }}</strong></p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+	<div class="col">
+		<h1 class="mt-5"><strong>Audit Trail &#x1F4BB;</strong></h1>
+		<table class="table table-striped table-bordered mt-3">
+			<thead>
+				<tr>
+					<th>Log Number</th>
+					<th>Name</th>
+					<th>Event Type</th>
+					<th>Event Description</th>
+					<th>Timestamp</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for log in logs %}
+					<tr>
+						<td>{{ log.log_id }}</td>
+						<td>{{ log.user.lname }}</td>
+						<td>{{ log.event_type }}</td>
+						<td>{{ log.event_description }}</td>
+						<td>{{ log.timestamp.strftime('%Y-%m-%d %I:%M:%S %p') }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+</div>
+{% endblock %}

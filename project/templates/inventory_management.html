@@ -1,0 +1,99 @@
+{% extends 'admindashboard.html' %}
+{% block content %}
+
+<div class="container content-section mt-5 pt-3">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h1><a href="{{ url_for('inventory') }}" style="color: black; text-decoration: none;">Inventory Management &#x1F484;</a></h1>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="d-flex justify-content-end">
+                    <form class="me-3" action="{{ url_for('inventory_search') }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search by product name" name="product">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </div>
+                    </form>
+                    <a type="button" class="btn btn-primary" href="{{ url_for('inventory_create') }}"> Create </a>
+                    <a href="#" class="btn btn-danger ms-3" data-bs-toggle="modal" data-bs-target="#productUserModal">Delete</a>
+                    
+                    <a href="{{ url_for('download_inventory') }}" class="btn btn-success ms-3"> Generate </a>
+                </div>
+            </div>
+        </div>
+        <table class="table table-striped table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Expiration Date </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in inventory.items %}
+                    <tr data-products-id="{{ product.id }}">
+                        <td>{{ product.product }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.stock }}</td>
+                         <td>{% if product.expiration_date %}{{ product.expiration_date.strftime('%B %d, %Y') }}{% else %}N/A{% endif %}</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ url_for('inventory_edit', inventory_id=product.inventory_id) }}" class="btn btn-warning"> Edit </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div>
+            <div>
+                {% for page_num in inventory.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if inventory.page == page_num %}
+                            <a class="btn btn-info mb-4 " href="{{ url_for('inventory', page=page_num) }}">{{ page_num }}</a>
+                        {% else %}
+                            <a class="btn btn-outline-info mb-4 " href="{{ url_for('inventory', page=page_num) }}">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        ...
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="productUserModal" tabindex="-1" aria-labelledby="productModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Remove Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('delete_product') }}">
+                    <div class="form-group">
+                        <label for="product">Product:</label>
+                        <input type="text" class="form-control" id="product" name="product" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-danger">Remove Product</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+<!-- <a href="#" class="btn btn-danger ms-3" data-bs-toggle="modal" data-bs-target="#deactivateUserModal">Deactivate</a> -->

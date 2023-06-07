@@ -1,0 +1,97 @@
+{% extends 'admindashboard.html' %}
+
+
+{% block content %}
+
+<div class="container content-section mt-5">
+    <h1>Employee Creation &#128104;&#8205;&#128188 </h1>
+    <form method="POST" action="{{ url_for('employee_create') }}" class="row g-3">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+        <div class="col-md-6">
+            {{ form.fname.label(class="form-label") }}
+            {% if form.fname.errors %}
+            {{ form.fname(class="form-control is-invalid ") }}
+            <div class="invalid-feedback">
+                {% for errors in form.fname.errors %}
+                <span>{{ error }}</span>
+                Too Short! 2-50 Characters
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.fname(class="form-control") }}
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.lname.label(class="form-label") }}
+            {% if form.lname.errors %}
+            {{ form.lname(class="form-control is-invalid ") }}
+            <div class="invalid-feedback">
+                {% for errors in form.lname.errors %}
+                <span>{{ error }}</span>
+                Too Short! 2-50 Characters
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.lname(class="form-control") }}
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.password.label(class="form-label") }}
+            {% if form.password.errors %}
+            {{ form.password(class="form-control is-invalid ") }}
+            <div class="invalid-feedback">
+                {% for errors in form.password.errors %}
+                <span>{{ error }}</span>
+                Password must contain at least one digit, one uppercase letter, one lowercase letter, and one of the following symbols: $@! and minimum of 8 Characters
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.password(class="form-control") }}
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.role.label(class="form-label") }}
+            {% if form.role.errors %}
+            {{ form.role(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.role.errors %}
+                <span>{{ error }}</span>
+                Pick a Role!
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.role(class="form-control") }}
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.email.label(class="form-control-label") }}
+            {% if form.email.errors %}
+            {{ form.email(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                <span>{{ error }}</span>
+                Invalid Email or email already exist
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.email(class="form-control") }}
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.submit(class="btn btn-outline-primary") }}
+        </div>
+
+    </form>
+</div>
+
+
+
+
+
+{% endblock %}

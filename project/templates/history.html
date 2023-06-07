@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-3 content-section" >
+    <h1> My Appointment </h1>
+
+
+    {% if appointments %}
+    <table class="table table-striped table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Branch</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Service</th>
+                <th>Service #2</th>
+                <th>Service #3</th>
+                <th>Paid</th>
+                <th>Status</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr data-user-id="{{ appointment.id }}">
+                <td>{{ appointment.branch }}</td>
+                <td>{{ appointment.user.lname }}</td>
+                <td>{{ appointment.date.strftime('%B %d, %Y, %I:%M %p') }}</td>
+                <td>{{ appointment.service or '' }}</td>
+                <td>{{ appointment.service2 or '' }}</td>
+                <td>{{ appointment.service3 or '' }}</td>
+                <td>{{ 'Paid' if appointment.is_paid else 'Not Paid' }}</td>
+                <td>{{ 'Done' if appointment.is_done else 'Ongoing' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <br>
+    <p>No appointments found.</p>
+    {% endif %}
+    <div>
+            {% for page_num in appointments.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if appointments.page == page_num %}
+                            <a class="btn btn-info mb-4 "  href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                        {% else %}
+                            <a class="btn btn-outline-info mb-4 "  href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                        {% endif %}        
+                    {% else %}
+                        ...
+                    {% endif %}
+                {% endfor %}
+            </div>
+</div>
+
+
+
+{% endblock %}

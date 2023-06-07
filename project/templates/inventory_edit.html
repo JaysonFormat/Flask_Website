@@ -1,0 +1,97 @@
+{% extends 'admindashboard.html' %}
+
+
+{% block content %}
+
+
+<div class="mt-5 container content-section " >
+	<div class="mt-3">
+		<h1>Edit Product &#x1F484 </h1>
+		<form method="POST" action="{{ url_for('inventory_edit', inventory_id=inventory.inventory_id) }}" class="row g-3" >
+			{{ form.hidden_tag() }}
+			
+			<div class="col-md-6">
+			{{ form.product.label(class="form-label") }}
+			{% if form.product.errors %}
+			{{ form.product(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.product.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.product(class="form-control") }}
+			{% endif %}
+		</div>
+
+		<div class="col-md-6">
+			{{ form.category.label(class="form-label") }}
+			{% if form.category.errors %}
+			{{ form.category(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.category.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.category(class="form-control") }}
+			{% endif %}
+		</div>
+
+		<div class="col-md-12">
+			{{ form.price.label(class="form-label") }}
+			{% if form.price.errors %}
+			{{ form.price(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.price.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.price(class="form-control") }}
+			{% endif %}
+		</div>
+
+		<div class="col-md-12">
+			{{ form.stock.label(class="form-label") }}
+			{% if form.stock.errors %}
+			{{ form.stock(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.stock.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.stock(class="form-control") }}
+			{% endif %}
+		</div>
+
+		<div class="col-md-12">
+			{{ form.expiration_date.label(class="form-label") }}
+			{% if form.expiration_date.errors %}
+			{{ form.expiration_date(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.expiration_date.errors %}
+				<span>{{ error }}</span>
+				Expiration date must be in the future
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.expiration_date(class="form-control") }}
+			{% endif %}
+		</div>
+
+		<div>
+			{{ form.submit_update(class="btn btn-outline-primary") }}
+		</div>
+
+		</form>
+	</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css' ) }}">
+  <link rel="shortcut icon" href="{{ url_for('static',filename='scissors.png') }}">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  
+  <title> {{ title }} </title>
+
+</head>
+<body class="ghostwhite d-flex flex-column min-vh-100 " >
+  <nav class="navbar bg-dark navbar-expand-lg sticky-top " data-bs-theme="dark" >
+    <div class="container-fluid" >
+      <a class="navbar-brand" href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='scissors.png' ) }}" alt="Bootstrap" width="35" height="45">
+        Nail Lounge and Spa
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation navbar-light">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0  ">
+          <li class="nav-item">
+            <a class="nav-link " aria-current="page" href="{{ url_for('index') }}"> <i class="bi bi-house"></i> Home</a>
+          </li>
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('service') }}"> <i class="bi bi-book"></i> Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('booking') }}"> <i class="bi bi-bag"></i> Book</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('history') }}"> <i class="bi bi-card-list"></i> Appointment</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('service') }}"> <i class="bi bi-list-task"></i> Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled " href="#"> <i class="bi bi-bag"></i> Book</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled " href="#"><i class="bi bi-card-list"></i> Appointment</a>
+          </li>
+          {% endif %}
+        </ul>
+        <ul class="navbar-nav justify-content-right" >
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('account') }}"> <i class="bi bi-person-circle"></i> Account</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}"> <i class="bi bi-door-closed"></i> Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}"> <i class="bi bi-door-open"></i> Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signup') }}"> <i class="bi bi-door-closed"></i> Sign up</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} container text-center">
+    {{ message }}
+    <button type="button" class="btn-close float-end" data-bs-dismiss='alert' aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  {% block content %}
+
+
+
+  {% endblock %}
+
+
+
+  <footer class="bg-dark text-light py-3 flex-shrink-0 mt-auto">
+    <div class="container text-center">
+      <p>&copy; 2023 My Company</p>
+    </div>
+  </footer>
+</body>
+</html>

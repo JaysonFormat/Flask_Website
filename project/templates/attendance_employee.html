@@ -1,0 +1,126 @@
+{% extends "admindashboard.html" %}
+
+
+
+
+{% block content %}
+
+<div class=" container mt-5 content-section " >
+    <h1><a href="{{ url_for('attendance') }}" style="color: black; text-decoration: none;">Attendance &#x023F2;</a></h1>
+    <div class="d-flex justify-content-end">
+        <form class="d-flex justify-content-end me-3" action="{{ url_for('attendance_search') }}" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search by last name" name="lname">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </div>
+        </form>
+        <a href="{{ url_for('download_attendance') }}" class="btn btn-success me-2" >Download</a>
+        <a href="#"  data-bs-toggle="modal"  data-bs-target="#time-inModal" class="btn btn-primary me-2"> Time-In </a>
+        <a href="#"  data-bs-toggle="modal"  data-bs-target="#time-outModal" class="btn btn-secondary me-2"> Time-Out </a>
+    </div>
+	<table class="table table-striped table-bordered mt-3" >
+		<thead class="text-center" >
+			<tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Role</th>
+				<th>Time In</th>
+				<th>Time Out</th>
+                <th>Total Hours</th>
+                <th>Overtime</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for attendance in attendances %}
+                    <tr>
+                        <td>{{ attendance.user.fname }}</td>
+                        <td>{{ attendance.user.lname }}</td>
+                        <td>{{ attendance.user.role }}</td>
+                        <td>{{ attendance.time_in.strftime('%B %d, %Y %I:%M %p') if attendance.time_in else 'None' }}</td>
+                        <td>{{ attendance.time_out.strftime('%B %d, %Y %I:%M %p') if attendance.time_out else 'None' }}</td>
+                        <td>{{ attendance.total_hours if attendance.total_hours else 'None' }}</td>
+                        <td>
+                            {% set overtime_hours = attendance.calculate_overtime_hours() %}
+                            {{ overtime_hours.total_seconds() / 3600 if overtime_hours else 'None' }}
+                        </td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+<div>
+    {% for page_num in attendances.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% set page_num = page_num|int %}  {# Convert page_num to integer #}
+            {% if attendances.page == page_num %}
+                <a class="btn btn-info mb-4" href="{{ url_for('attendance', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-info mb-4" href="{{ url_for('attendance', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+</div>
+
+</div>
+
+
+<div class="modal fade" id="time-inModal" tabindex="-1" aria-labelledby="time-inModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="time-inModalLabel">Time-In</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('time_in') }}">
+                   {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <label for="barcode">Barcode ID:</label>
+                        <input type="text" class="form-control" id="barcode" name="barcode" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-success">Time-In</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="modal fade" id="time-outModal" tabindex="-1" aria-labelledby="time-outModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="time-outModalLabel">Time-Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('time_out') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="barcode">Barcode ID:</label>
+                            <input type="text" class="form-control" id="barcode" name="barcode" required> <!-- Change to email to string -->
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-success">Time-Out</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+<!-- Create modal for time in and time out sa form ay nandun i scan  -->

@@ -1,0 +1,50 @@
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel"aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appointmentModalLabel">Book Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('app_management_book') }}" class="row g-3">
+                    {{ form.hidden_tag() }}
+                    <div class="col-md-6">
+                        <label for="{{ form.branch.id }}" class="form-label">{{ form.branch.label }}</label>
+                        {{ form.branch(class="form-control", id=form.branch.id) }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.service.id }}" class="form-label">{{ form.service.label }}</label>
+                        {{ form.service(class="form-control", id=form.service.id) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.service2.id }}" class="form-label">{{ form.service2.label }}</label>
+                        {{ form.service2(class="form-control", id=form.service2.id) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.service3.id }}" class="form-label">{{ form.service3.label }}</label>
+                        {{ form.service3(class="form-control", id=form.service3.id) }}
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="{{ form.date.id }}" class="form-label">{{ form.date.label }}</label>
+                        {{ form.date(class="form-control", id=form.date.id) }}
+                    </div>
+                    <div class="col-md-12">
+                        <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control", id=form.email.id) }}
+                    </div>
+                    <div class="col-12">
+                        <br>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+{% extends "admindashboard.html" %}
+
+
+{% block content %}
+
+        <div class="container-lg content-section mt-5 pt-3">
+            <div class="container-lg mt-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1><a href="{{ url_for('employee_management') }}" style="color: black; text-decoration: none;">Employee Management &#128104;&#8205;&#128188;</a></h1>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <form class="d-flex justify-content-end me-3" action="{{ url_for('employee_search') }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group">
+                            <input type="text"  class="form-control" placeholder="Search by last name" name="lname">
+                            <button class="btn btn-outline-success" type="submit"> Search </button>
+                        </div>
+                    </form>
+                    <br>
+                    <div class="d-flex justify-content-end">
+                        <a type="button" class="btn btn-primary me-2" href="{{ url_for('employee_create') }}"> Create </a>
+                        <a href="#" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#activateEmpModal">Activate</a>
+                        <a href="#" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deactivateEmployeeModal">Deactivate</a>
+                        <a href="{{ url_for('download_employee') }}" class="btn btn-success me-2"> Generate </a>
+                    </div>
+                    </div>
+                </div>
+                <table class="table table-striped table-bordered mt-3">
+                    <thead class="text-center">
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Address</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                        <tr data-user-id="{{ user.id }}">
+                            <td>{{ user.fname }}</td>
+                            <td>{{ user.lname }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.contact }} </td>
+                            <td>{{ user.address }}</td>
+                            <td>{{ 'Activate' if user.is_active else 'Deactivate' }}</td>
+                            <td class="text-center" ><a href="{{ url_for('employee_account', user_id=user.user_id) }}" class="btn btn-outline-warning btn-sm">Account</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div>
+                    <div>
+                        {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if users.page == page_num %}
+                                <a class="btn btn-info mb-4 " href="{{ url_for('employee_management', page=page_num) }}">{{ page_num }}</a>
+                            {% else %}
+                                <a class="btn btn-outline-info mb-4 " href="{{ url_for('employee_management', page=page_num) }}">{{ page_num}}</a>
+                            {% endif %}
+                        {% else %}
+                        ...
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deactivateEmployeeModal" tabindex="-1" aria-labelledby="deactivateEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deactivateEmployeeModalLabel">Deactivate Employee</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="{{ url_for('deactivate_employee') }}">
+                                <div class="form-group">
+                                    <label for="email">Email:</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-danger">Deactivate Employee</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <div class="modal fade" id="activateEmpModal" tabindex="-1" aria-labelledby="activateEmpModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="activateEmpModalLabel">Activate Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('activate_employee') }}">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-info">Activate Employee</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

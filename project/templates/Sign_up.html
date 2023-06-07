@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="container-sm mt-5 pb-5 content-section ">
+    <div class="container-fluid d-flex justify-content-center pt-3 ">
+        <h1>
+            SIGN UP PAGE
+        </h1>
+    </div>
+    <div class="container" >
+        <div class="row justify-content-center" >
+            <div class="col-lg-6">
+                <form action="#" method="POST" class="needs-validate" novalidate >
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.fname.label(class="form-label") }}
+                        {% if form.fname.errors %}
+                        {{ form.fname(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.fname.errors %}
+                            <span>{{ error }}</span>
+                            Too Short! 2-50 Characters
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.fname(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3" >
+                        {{ form.lname.label(class="form-label") }}
+                        {% if form.lname.errors %}
+                        {{ form.lname(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.lname.errors %}
+                            <span>{{ error }}</span>
+                            Too Short! 2-50 Characters
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.lname(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.password.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                            Password must contain at least one digit, one uppercase letter, one lowercase letter, and one of the following symbols: $@! and minimum of 8 Characters
+                        </div>
+                        {% else %}
+                        {{ form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.confirm_password.errors %}
+                            <span>{{ error }}</span>
+                            Password not match!
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.terms(class="form-check-input") }}
+                        {{ form.terms.label(class="form-check-label") }}
+
+                        <a href="{{ url_for('terms_and_conditions') }}"> Read Terms </a>.
+                        {% if form.terms.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.terms.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="mb-3" >
+                        {{ form.submit(class="btn btn-outline-primary") }}
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class=" container " >
+        <div class="row justify-content-center" >
+            <div class="col-lg-6" >
+                <div class=" pt-3 ">
+                    <small class="text-muted" >
+                        Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Login</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

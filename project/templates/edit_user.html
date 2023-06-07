@@ -1,0 +1,92 @@
+{% extends 'admindashboard.html' %}
+{% block content %}
+
+<div class="container content-section mt-5 ">
+  <div class="col-md-9">
+    <div class="container-sm mt-2">
+      <div class="container-fluid d-flex justify-content-left pt-3">
+        <h1>Customer Account Information &#x1F4C3 </h1>
+      </div>
+
+    </div>
+  </div>
+  <div class="justify-content-left">
+    <div class="col-lg-8">
+      <form method="POST" class="needs-validate" novalidate enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.fname.label(class="form-label") }}
+          {% if form.fname.errors %}
+          {{ form.fname(class="form-control is-invalid ") }}
+          <div class="invalid-feedback">
+            {% for errors in form.fname.errors %}
+            <span>{{ error }}</span>
+            Too Short! 2-50 Characters
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.fname(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <div class="col-sm-4">
+          {{ form.contact.label(class="form-label") }}
+          {% if form.contact.errors %}
+          {{ form.contact(class="form-control is-invalid ") }}
+          <div class="invalid-feedback">
+            {% for errors in form.contact.errors %}
+            <span>{{ error }}</span>
+            Please enter a valid contact number.
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.contact(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <br>
+
+        <div class="mb-3">
+          {{ form.lname.label(class="form-label") }}
+          {% if form.lname.errors %}
+          {{ form.lname(class="form-control is-invalid ") }}
+          <div class="invalid-feedback">
+            {% for errors in form.lname.errors %}
+            <span>{{ error }}</span>
+            Too Short! 2-50 Characters
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.lname(class="form-control") }}
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid ") }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.email(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <div>
+          <a href="{{ url_for('user_changepass', user_id=user_id) }}" class="btn btn-success"> Change Password </a>
+        </div>
+
+        <br>
+        <div class="mb-3">
+          {{ form.submit(class="btn btn-outline-primary") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

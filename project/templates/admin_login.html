@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-sm mt-5 pb-5 content-section flex-grow-1 ">
+    <div class="container-fluid d-flex justify-content-center pt-3 ">
+        <h1>
+            ADMIN LOGIN PAGE
+        </h1>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form action="#" method="POST" class="needs-validate" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.email.errors %}
+                            <span>{{ error }}</span>
+                            Invalid Email (example@gmail.com)
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-control is-invalid ") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.password.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-check mb-3 ">
+                        {{ form.remember(class="form-check-input") }}
+                        {{ form.remember.label(class="form-check-label") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.submit(class="btn btn-outline-primary") }}
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

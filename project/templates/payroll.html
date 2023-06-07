@@ -1,0 +1,110 @@
+{% extends 'admindashboard.html' %}
+{% block content %}
+	<div class="container content-section mt-5">
+		<h1> Payroll &#x1F4B5 </h1>
+		<form method="POST" action="{{ url_for('payroll', user_id=user_id) }}"  >
+			{{ form.csrf_token }}
+			<div class="row">
+				<div class="col-md-6">
+					{{ form.full_name.label(class="form-label") }}
+					{% if form.full_name.errors %}
+						{{ form.full_name(class="form-control is-invalid", disabled=True) }}
+						<div class="invalid-feedback">
+							{% for errors in form.full_name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.full_name(class="form-control", disabled = True) }}
+					{% endif %}
+				</div>
+				<div class="col-md-6">
+					{{ form.total_hours.label(class="form-label") }}
+					{% if form.total_hours.errors %}
+						{{ form.total_hours(class="form-control is-invalid", disabled=True) }}
+						<div class="invalid-feedback">
+							{% for error in form.total_hours.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.total_hours(class="form-control", value="{:.0f}".format(total_hours), disabled=True) }}
+					{% endif %}
+				</div>
+				<div class="col-md-6 mt-4">
+					{{ form.total_overtime.label(class="form-label") }}
+					{% if form.total_overtime.errors %}
+						{{ form.total_overtime(class="form-control is-invalid", disabled=True) }}
+						<div class="invalid-feedback">
+							{% for error in form.total_overtime.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.total_overtime(class="form-control", value="{:.0f}".format(total_overtime), disabled=True) }}
+					{% endif %}
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-md-6">
+					{{ form.payrate.label(class="form-label") }}
+					{% if form.payrate.errors %}
+						{{ form.payrate(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for errors in form.payrate.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.payrate(class="form-control") }}
+					{% endif %}
+				</div>
+				<div class="col-md-6">
+					<label for="month" class="form-label">Month</label>
+					<select class="form-select"  name="month" aria-label="Month">
+						<option selected>Open this select menu</option>
+						<option value="January">January</option>
+						<option value="February">February</option>
+						<option value="March">March</option>
+						<option value="April">April</option>
+						<option value="May">May</option>
+						<option value="June">June</option>
+						<option value="July">July</option>
+						<option value="August">August</option>
+						<option value="September">September</option>
+						<option value="October">October</option>
+						<option value="November">November</option>
+						<option value="December">December</option>
+					</select>
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-md-6">
+					{{ form.tax.label(class="form-label") }}
+					{% if form.tax.errors %}
+						{{ form.tax(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for errors in form.tax.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.tax(class="form-control") }}
+					{% endif %}
+				</div>
+			</div>			
+			<br>
+			<div class="row">
+				<div class="mb-3" >
+					 <button type="submit" class="btn btn-outline-info">Calculate</button>
+				</div>
+				<div class="mb-3">
+					<a  href="{{ url_for('download_payroll', user_id=user_id) }}" class="btn btn-outline-success"> Download History </a>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "admindashboard.html" %}
+
+{% block content %}
+
+<div class="container content-section mt-5" >
+	<h1>User Creation &#x1F487</h1>
+	<form  method="POST" action="{{ url_for('create_user') }}" class="row g-3">
+		{{ form.hidden_tag() }}
+
+		<div class="col-md-6">
+			{{ form.fname.label(class="form-label") }}
+			{% if form.fname.errors %}
+			{{ form.fname(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.fname.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.fname(class="form-control") }}
+			{% endif %}
+		</div>
+		<div class="col-md-6">
+			{{ form.lname.label(class="form-label") }}
+			{% if form.lname.errors %}
+			{{ form.lname(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.lname.errors %}
+				<span>{{ error }}</span>
+				Too Short! 2-50 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.lname(class="form-control") }}
+			{% endif %}
+		</div>
+		<div class="col-md-12">
+			{{ form.email.label(class="form-label") }}
+			{% if form.email.errors %}
+			{{ form.email(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for error in form.email.errors %}
+				<span>{{ error }}</span>
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.email(class="form-control") }}
+			{% endif %}
+		</div>
+		<div class="col-md-12">
+			{{ form.password.label(class="form-label") }}
+			{% if form.password.errors %}
+			{{ form.password(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.password.errors %}
+				<span>{{ error }}</span>
+				Password must contain at least one digit, one uppercase letter, one lowercase letter, and one of the following symbols: $@! and minimum of 8 Characters
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.password(class="form-control") }}
+			{% endif %}
+		</div>
+		<div class="col-md-12">
+			{{ form.confirm_password.label(class="form-label") }}
+			{% if form.confirm_password.errors %}
+			{{ form.confirm_password(class="form-control is-invalid ") }}
+			<div class="invalid-feedback">
+				{% for errors in form.confirm_password.errors %}
+				<span>{{ error }}</span>
+				Password not match!
+				{% endfor %}
+			</div>
+			{% else %}
+			{{ form.confirm_password(class="form-control") }}
+			{% endif %}
+		</div>
+		<div class="col-12">
+			<br>
+			{{ form.submit(class="btn btn-primary", disabled=False) }}
+			
+		</div>
+	</form>
+</div>
+
+{% endblock %}

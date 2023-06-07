@@ -1,0 +1,165 @@
+{% extends 'admindashboard.html' %}
+
+{% block content %}
+
+
+<div class="container content-section mt-5 ">
+  <h1>Employee Information &#x1F4BC; </h1>
+  <form method="POST" action="{{ url_for('employee_account', user_id=user_id) }}" class="needs-validate row g-3" novalidate enctype="multipart/form-data" >
+    {{ form.hidden_tag() }}
+    
+    <div class="col-md-6">
+      {{ form.fname.label(class="form-label") }}
+      {% if form.fname.errors %}
+        {{ form.fname(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for errors in form.fname.errors %}
+            <span>{{ error }}</span>
+            Too Short! 2-50 Characters
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.fname(class="form-control") }}
+      {% endif %}
+    </div>
+    <br>
+    <div class="col-md-6">
+      {{ form.lname.label(class="form-label") }}
+      {% if form.lname.errors %}
+        {{ form.lname(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for errors in form.lname.errors %}
+            <span>{{ error }}</span>
+            Please enter a valid Lastname number.
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.lname(class="form-control") }}
+      {% endif %}
+    </div>
+    <br>
+    <div class="col-md-6">
+      {{ form.role.label(class="form-label") }}
+      {% if form.role.errors %}
+        {{ form.role(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for errors in form.role.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.role(class="form-control") }}
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      {{ form.email.label(class="form-label") }}
+      {% if form.email.errors %}
+        {{ form.email(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for error in form.email.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.email(class="form-control") }}
+      {% endif %}
+    </div>
+    <div class="form-group col-md-6 ">
+      {{ form.gender.label(class="form-control-label") }}
+      <br>
+      {% for subfield in form.gender %}
+        {{ subfield() }} {{ subfield.label(class="form-check-label") }}
+        <br>
+      {% endfor %}
+      {% for error in form.gender.errors %}
+        <div class="invalid-feedback">
+          {{ error }}
+        </div>
+      {% endfor %}
+    </div>
+    <br>
+    <div class="col-md-6">
+      {{ form.age.label(class="form-label") }}
+      {% if form.age.errors %}
+        {{ form.age(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for error in form.age.errors %}
+            <span>{{ error }}</span>
+            We only accept 18 years old above
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.age(class="form-control") }}
+      {% endif %}
+    </div>
+    <br>
+    <div class="col-md-6">
+      {{ form.contact.label(class="form-label") }}
+      {% if form.contact.errors %}
+        {{ form.contact(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for error in form.contact.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.contact(class="form-control") }}
+      {% endif %}
+    </div>
+    <div class="mb-3">
+      {{ form.address.label(class="form-label") }}
+      {% if form.address.errors %}
+        {{ form.address(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for error in form.address.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.address(class="form-control") }}
+      {% endif %}
+    </div>
+    <div class="mb-3">
+      {{ form.file.label() }}
+      {{ form.file(class="form-control form-control-file") }}
+      {% if form.file.errors %}
+        {% for error in form.file.errors %}
+          <div class="invalid-feedback d-block">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+        <div class="mb-3">
+      {{ form.barcode.label(class="form-label") }}
+      {% if form.barcode.errors %}
+        {{ form.barcode(class="form-control is-invalid ") }}
+        <div class="invalid-feedback">
+          {% for error in form.barcode.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.barcode(class="form-control") }}
+      {% endif %}
+    </div>
+
+    <div class="mb-3" >
+  <a href="{{ url_for('update_password_employee', user_id=user_id ) }}" class='btn btn-success'> Change Password </a>
+  <a href="{{ url_for('payroll', user_id=user_id) }}" class="btn btn-primary">Payroll</a>
+  {% if employee.filename %}
+    <a href="{{ url_for('download_documents', file_pdf=employee.filename) }}" class="btn btn-primary"> Download Documents </a>
+  {% else %}
+    <button class="btn btn-primary" disabled> Download Documents </button>
+  {% endif %}
+</div>
+
+    <div class="mb-3">
+      {{ form.update(class="btn btn-outline-primary") }}
+    </div>
+  </form>
+</div>
+
+
+{% endblock %}
