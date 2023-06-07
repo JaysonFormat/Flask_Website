@@ -1,4 +1,3 @@
-# import ntplib
 import jwt
 from datetime import datetime, timezone, timedelta
 from project import db, login_manager, app
