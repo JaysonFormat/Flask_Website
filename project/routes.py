@@ -617,7 +617,7 @@ def customer_search():
         users = User.query.filter_by(role='Customer').order_by(User.date_join.desc()).paginate(page=page, per_page=5)
 
     # Render the template with the users data and the form
-    return render_template('usermanagement.html',title=Customer Management, users=users, form=form)
+    return render_template('usermanagement.html',title='Customer Management', users=users, form=form)
 
 
 @app.route('/appointment_search', methods=['GET', 'POST'])
@@ -643,7 +643,7 @@ def appointment_search():
         appointments = Book_date.query.order_by(Book_date.book_id.desc()).paginate(page=page, per_page=5)
 
         # Render the template with the appointments data and the form
-        return render_template('appointment_management.html',Appointment Management, appointments=appointments, form=form)
+        return render_template('appointment_management.html',title='Appointment Management', appointments=appointments, form=form)
 
 
 @app.route('/inventory', methods=['GET','POST'])

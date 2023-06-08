@@ -111,7 +111,7 @@
           <div class="col-sm-2"></div>
           <div class="col-sm-7">
             {{ form.submit(class='btn btn-outline-primary') }}         
-            {{ form.submit_another(id='submit_another',class='btn btn-outline-secondary', disabled=True) }}
+            <!-- {{ form.submit_another(id='submit_another',class='btn btn-outline-secondary', disabled=True) }} -->
             {% if form.errors %}
               {% for field, errors in form.errors.items() %}
                 {% for error in errors %}
