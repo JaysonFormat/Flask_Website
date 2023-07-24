@@ -21,6 +21,8 @@
 				<thead>
 					<tr>
 						<th>Last Name</th>
+						<th>Service</th>
+						<th>Branch</th>
 						<th>Email</th>
 						<th>Contact</th>
 						<th>Address</th>
@@ -31,9 +33,12 @@
 					{% for book_pay in payments.items %}
 						<tr data-book-id="{{ book_pay.id }}">
 							<td>{{ book_pay.user.lname }}</td>
+							<td>{{ book_pay.service }}</td>
+							<td>{{ book_pay.branch }}</td>
 							<td>{{ book_pay.user.email }}</td>
 							<td>{{ book_pay.user.contact }} </td>
 							<td>{{ book_pay.user.address }}</td>
+							<td>{{ book_pay.date.strftime('%B %d %Y %I:%M %p') }}</td>
 							<td>{{ 'Yes' if book_pay.is_paid }}</td>
 						</tr>
 					{% endfor %}

@@ -1,4 +1,5 @@
 import re
+from flask import flash
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -127,30 +128,31 @@ class AppointmentForm(FlaskForm):
 
     branch = SelectField('Branch', validators=[DataRequired()], choices=[('','Select your Branch'),('FCM','Fairview Center Mall Branch'),('Zapote','Zapote Branch')])
     
-    service = SelectField('Book #1', validators=[DataRequired()], choices=[('','What type of service do you want?'),('Haircut with style','Haircut with style'),('Haircut Trim','Haircut Trim'),('Traditional Perm','Traditional Perm'),('Hair Extenstion','Hair Extenstion'),('Hair Color','Hair Color')
+    service = SelectField('Book #1', validators=[DataRequired()], choices=[('','What type of service do you want?'),('Haircut with Style','Haircut with Style - 150.00 '),('Haircut Trim','Haircut Trim - 100.00'),('Traditional Perm','Traditional Perm - 800.00 and UP'),('Hair Extension','Hair Extension - 5,000 and UP'),('Hair Color','Hair Color - 800.00 and UP')
+        ,('Highlights','Highlights - 800.00 and UP'),('Hair Rebond','Hair Rebond - 1,000.00 and UP'),('Brazilian','Brazilian - 1,000 and UP'),('Bayalage','Bayalage - 1,800 and UP'),('',''),('Manicure','Manicure - 100.00'),('Pedicure','Pedicure - 100.00'),('Manicure Gel','Manicure Gel - 800.00'),('Ordinary Manicure','Ordinary Manicure - 600.00'),('Pedicure Gel','Pedicure Gel - 800.00'),('Pedicure Ordinary','Pedicure Ordinary - 600.00'),('Nail Extension','Nail Extension - 1,000 and UP')
+        ,('Footspa','Footspa - 250.00'),('Footspa with Footmask','Footspa with Footmask - 250.00 '),('Footspa with Gel','Footspa with Gel - 300.00'),('',''),('1 Hour Massage','1 Hour Massage - 300.00'),('1 1/2 Massage','1 1/2 Massage - 450.00'),('2 Hours Massage','2 Hours Massage - 250.00'),('1 Hour Massage with Hot Compress','1 Hour Massage with Hot Compress - 350.00'),('1 1/2 Hour Massage with Hot Compress','1 1/2 Hour Massage with Hot Compress - 500.00')
+        ,('2 Hours Massage with Hot Compress','2 Hours Massage with Hot Compress - 700.00'),('1 Hour Massage with Hot Stone','1 Hour Massage with Hot Stone - 400.00'),('1 1/2 Hour Massage with Hot Stone', '1 1/2 Hour Massage with Hot Stone - 600.00'),('2 Hours Massage with Hot Stone','2 Hours Massage with Hot Stone - 800.00 '),('1 1/2 Hour Massage with Ventosa','1 1/2 Hour Massage with Ventosa - 600.00'),('2 Hour Massage with Ventosa','2 Hour Massage with Ventosa - 800.00')
+        ,('30 Mins FootReflex','30 mins FootReflex - 200.00'),('1 Hour FootReflex','1 Hour Footreflex - 400.00'),('Ear Candle Only','Ear Candle Only - 200.00'),('Ear Candle with Massage','Ear Candle with Massage - 200.00 with massage 150.00 '),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage - 600.00'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage - 900.00'),('',''),('Whitening','Whitening - 350.00'),('Waxing Underarm','Waxing Underarm - 300.00')
+        ,('Waxing Legs','Waxing Legs - 600.00 '),('Waxing Bikini','Waxing Bikini - 200.00'),('Eyelash Extension','Eyelash Extension - 800.00'),('Eyelash Firming','Eyelash Firming - 300.00'),('Eyebrow Threading','Eyebrow Threading - 200.00'),('Eyebrow Shaving','Eyebrow Shaving - 100.00'),('Traditional Hair & Make-up','Traditional Hair & Make-up - 800.00'),('Air Brush Make-up','Air Brush Make-up - 1,500.00')])
+
+
+    service2 = SelectField('Book #2', validators=[Optional()], choices=[('','Add more service?'),('Haircut with Style','Haircut with Style'),('Haircut Trim','Haircut Trim'),('Traditional Perm','Traditional Perm'),('Hair Extension','Hair Extension'),('Hair Color','Hair Color')
+        ,('Highlights','Highlights'),('Hair Rebond','Hair Rebond'),('Brazilian','Brazilian'),('Bayalage','Bayalage'),('',''),('Manicure','Manicure'),('Pedicure','Pedicure'),('Manicure Gel','Manicure Gel'),('Ordinary Manicure','Ordinary Manicure'),('Pedicure Gel','Pedicure Gel'),('Pedicure Ordinary','Pedicure Ordinary')
+        ,('Footspa','Footspa'),('Footspa with Footmask','Footspa with Footmask'),('Footspa with Gel','Footspa with Gel'),('',''),('1 Hour Massage','1 Hour Massage'),('1 1/2 Massage','1 1/2 Massage'),('2 Hours Massage','2 Hours Massage'),('1 Hour Massage with Hot Compress','1 Hour Massage with Hot Compress'),('1 1/2 Hour Massage with Hot Compress','1 1/2 Hour Massage with Hot Compress')
+        ,('2 Hours Massage with Hot Compress','2 Hours Massage with Hot Compress'),('1 Hour Massage with Hot Stone','1 Hour Massage with Hot Stone'),('1 1/2 Hour Massage with Hot Stone', '1 1/2 Hour Massage with Hot Stone'),('2 Hours Massage with Hot Stone','2 Hours Massage with Hot Stone '),('1 Hour Massage with Ventosa','1 Hour Massage with Ventosa'),('1 1/2 Hour Massage with Ventosa','1 1/2 Hour Massage with Ventosa')
+        ,('30 Mins FootReflex','30 mins FootReflex'),('1 Hour FootReflex','1 Hour FootReflex'),('Ear Candle Only','Ear Candle Only'),('Ear Candle with Massage','Ear Candle with Massage'),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage'),('',''),('Whitening','Whitening'),('Waxing Underarm','Waxing Underarm')
+        ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extension','Eyelash Extension'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
+
+    service3 = SelectField('Book #3', validators=[Optional()], choices=[('','Add more service?'),('Haircut with Style','Haircut with Style'),('Haircut Trim','Haircut Trim'),('Traditional Perm','Traditional Perm'),('Hair Extension','Hair Extension'),('Hair Color','Hair Color')
         ,('Highlights','Highlights'),('Hair Rebond','Hair Rebond'),('Brazilian','Brazilian'),('Bayalage','Bayalage'),('',''),('Manicure','Manicure'),('Pedicure','Pedicure'),('Manicure Gel','Manicure Gel'),('Ordinary Manicure','Ordinary Manicure'),('Pedicure Gel','Pedicure Gel'),('Pedicure Ordinary','Pedicure Ordinary')
         ,('Footspa','Footspa'),('Footspa with Footmask','Footspa with Footmask'),('Footspa with Gel','Footspa with Gel'),('',''),('1 Hour Massage','1 Hour Massage'),('1 1/2 Massage','1 1/2 Massage'),('2 Hours Massage','2 Hours Massage'),('1 Hour Massage with Hot Compress','1 Hour Massage with Hot Compress'),('1 1/2 Hour Massage with Hot Compress','1 1/2 Hour Massage with Hot Compress')
         ,('2 Hours Massage with Hot Compress','2 Hours Massage with Hot Compress'),('1 Hour Massage with Hot Stone','1 Hour Massage with Hot Stone'),('1 1/2 Hour Massage with Hot Stone', '1 1/2 Hour Massage with Hot Stone'),('2 Hours Massage with Hot Stone','2 Hours Massage with Hot Stone '),('1 Hour Massage with Ventosa','1 Hour Massage with Ventosa'),('1 1/2 Hour Massage with Ventosa','1 1/2 Hour Massage with Ventosa')
         ,('30 Mins FootReflex','30 mins FootReflex'),('1 Hour FootReflex','1 Hour Footreflex'),('Ear Candle Only','Ear Candle Only'),('Ear Candle with Massage','Ear Candle with Massage'),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage'),('',''),('Whitening','Whitening'),('Waxing Underarm','Waxing Underarm')
-        ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extenstion','Eyelash Extenstion'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
-
-    service2 = SelectField('Book #2', validators=[Optional()], choices=[('','Add more service?'),('Haircut with style','Haircut with style'),('Haircut Trim','Haircut Trim'),('Traditional Perm','Traditional Perm'),('Hair Extenstion','Hair Extenstion'),('Hair Color','Hair Color')
-        ,('Highlights','Highlights'),('Hair Rebond','Hair Rebond'),('Brazilian','Brazilian'),('Bayalage','Bayalage'),('',''),('Manicure','Manicure'),('Pedicure','Pedicure'),('Manicure Gel','Manicure Gel'),('Ordinary Manicure','Ordinary Manicure'),('Pedicure Gel','Pedicure Gel'),('Pedicure Ordinary','Pedicure Ordinary')
-        ,('Footspa','Footspa'),('Footspa with Footmask','Footspa with Footmask'),('Footspa with Gel','Footspa with Gel'),('',''),('1 Hour Massage','1 Hour Massage'),('1 1/2 Massage','1 1/2 Massage'),('2 Hours Massage','2 Hours Massage'),('1 Hour Massage with Hot Compress','1 Hour Massage with Hot Compress'),('1 1/2 Hour Massage with Hot Compress','1 1/2 Hour Massage with Hot Compress')
-        ,('2 Hours Massage with Hot Compress','2 Hours Massage with Hot Compress'),('1 Hour Massage with Hot Stone','1 Hour Massage with Hot Stone'),('1 1/2 Hour Massage with Hot Stone', '1 1/2 Hour Massage with Hot Stone'),('2 Hours Massage with Hot Stone','2 Hours Massage with Hot Stone '),('1 Hour Massage with Ventosa','1 Hour Massage with Ventosa'),('1 1/2 Hour Massage with Ventosa','1 1/2 Hour Massage with Ventosa')
-        ,('30 Mins FootReflex','30 mins FootReflex'),('1 Hour FootReflex','1 Hour Footreflex'),('Ear Candle Only','Ear Candle Only'),('Ear Candle with Massage','Ear Candle with Massage'),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage'),('',''),('Whitening','Whitening'),('Waxing Underarm','Waxing Underarm')
-        ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extenstion','Eyelash Extenstion'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
-
-    service3 = SelectField('Book #3', validators=[Optional()], choices=[('','Add more service?'),('Haircut with style','Haircut with style'),('Haircut Trim','Haircut Trim'),('Traditional Perm','Traditional Perm'),('Hair Extenstion','Hair Extenstion'),('Hair Color','Hair Color')
-        ,('Highlights','Highlights'),('Hair Rebond','Hair Rebond'),('Brazilian','Brazilian'),('Bayalage','Bayalage'),('',''),('Manicure','Manicure'),('Pedicure','Pedicure'),('Manicure Gel','Manicure Gel'),('Ordinary Manicure','Ordinary Manicure'),('Pedicure Gel','Pedicure Gel'),('Pedicure Ordinary','Pedicure Ordinary')
-        ,('Footspa','Footspa'),('Footspa with Footmask','Footspa with Footmask'),('Footspa with Gel','Footspa with Gel'),('',''),('1 Hour Massage','1 Hour Massage'),('1 1/2 Massage','1 1/2 Massage'),('2 Hours Massage','2 Hours Massage'),('1 Hour Massage with Hot Compress','1 Hour Massage with Hot Compress'),('1 1/2 Hour Massage with Hot Compress','1 1/2 Hour Massage with Hot Compress')
-        ,('2 Hours Massage with Hot Compress','2 Hours Massage with Hot Compress'),('1 Hour Massage with Hot Stone','1 Hour Massage with Hot Stone'),('1 1/2 Hour Massage with Hot Stone', '1 1/2 Hour Massage with Hot Stone'),('2 Hours Massage with Hot Stone','2 Hours Massage with Hot Stone '),('1 Hour Massage with Ventosa','1 Hour Massage with Ventosa'),('1 1/2 Hour Massage with Ventosa','1 1/2 Hour Massage with Ventosa')
-        ,('30 Mins FootReflex','30 mins FootReflex'),('1 Hour FootReflex','1 Hour Footreflex'),('Ear Candle Only','Ear Candle Only'),('Ear Candle with Massage','Ear Candle with Massage'),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage'),('',''),('Whitening','Whitening'),('Waxing Underarm','Waxing Underarm')
-        ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extenstion','Eyelash Extenstion'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
+        ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extension','Eyelash Extension'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
 
 
-    start_time = time(hour=10, minute=0)
-    end_time = time(hour=16, minute=0)
+    start_time = time(hour=8, minute=0)
+    end_time = time(hour=17, minute=0)
 
     # minimum date is tomorrow
     min_date = datetime.now().date() + timedelta(days=1)
@@ -167,7 +169,7 @@ class AppointmentForm(FlaskForm):
         validators=[DataRequired()], 
         default=min_time, 
         render_kw={'min': min_time.strftime('%Y-%m-%dT%H:%M'), 
-                   'max': datetime.combine(max_date, end_time).strftime('%Y-%m-%dT%H:%M'), 
+                            'max': max_time.combine(max_date, end_time).strftime('%Y-%m-%dT%H:%M'), 
             }
         )
       
@@ -175,14 +177,22 @@ class AppointmentForm(FlaskForm):
 
     submit_another = SubmitField('Paynow')
 
-    def validate_appointment_date(self, appointment_date):
-        if appointment_date.data.time() < self.start_time:
-            raise ValidationError('Appointment time must be after 10am.')
-        elif appointment_date.data.time() > self.end_time:
-            raise ValidationError('Appointment time must be before 4pm.')
+    # def validate_appointment_date(self, appointment_date):
+    #     appointment_time = appointment_date.data.time()
+    #     if appointment_time < self.start_time:
+    #         raise ValidationError('Appointment time must be after 8am.')
+    #     elif appointment_time >= self.end_time:
+    #         raise ValidationError('Appointment time must be before 5pm.')
 
     def validate(self):
         if not super(AppointmentForm, self).validate():
+            return False
+
+        appointment_date = self.date.data
+
+        if appointment_date.time() < self.start_time or appointment_date.time() > self.end_time:
+            flash('Appointment time must be between 8am and 5pm', 'danger')
+            # self.date.errors.append('Appointment time must be between 8am and 5pm.')
             return False
 
         if self.service3.data and not self.service2.data:
@@ -190,7 +200,6 @@ class AppointmentForm(FlaskForm):
             return False
 
         return True
-
 
 class EditUserForm(FlaskForm):
     fname = StringField("First name", validators=[DataRequired(), Length(min=2, max=50)])

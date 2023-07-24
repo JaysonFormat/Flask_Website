@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+<div class="container content-section mt-5">
+  <div class="mt-3">
+    <h1>Checkout Page &#x1F6D2</h1>
+  </div>
+
+  <div>
+    <!-- <h3 class="mt-4">Name: {{ selected_branch }}</h3> -->
+    <h3 class="mt-4">Branch: {{ selected_branch }}</h3>
+    <h3 class="mt-4">Service: {{ selected_service }}</h3>
+    <h3 class="mt-4">Date: {{ date }}</h3>
+    <h3 class="mt-4">Price: ₱{{ amount }}</h3>
+  </div>
+
+  <!-- Button to initiate payment -->
+  <button id="payButton" class="btn btn-outline-success mt-3">Checkout Now</button>
+
+  <!-- Include Axios using CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js"></script>
+
+  <script>
+    // Function to create the Checkout Session
+    function createCheckoutSession() {
+      // Retrieve necessary data for the payment
+      const amount = {{ amount }}; // Convert price to cents
+      const currency = 'PHP';
+      const description = '{{ selected_service}}' ;
+
+      // Make a POST request to your server-side Flask route to create the Checkout Session
+      axios.post('/create-checkout-session', {
+        amount: amount,
+        currency: currency,
+        description: description
+      })
+      .then(function(response) {
+        // Retrieve the checkout_url from the response
+        const checkoutUrl = response.data.checkout_url;
+
+        // Redirect the customer to the PayMongo checkout page
+        window.location.href = checkoutUrl;
+
+      })
+      .catch(function(error) {
+        console.error('Error creating Checkout Session:', error);
+      });
+    }
+
+    // Event listener for the Checkout Now button click
+    document.getElementById('payButton').addEventListener('click', function() {
+      // Call the function to create the Checkout Session and initiate payment
+      createCheckoutSession();
+    });
+  </script>
+</div>
+
+
+
+
+{% endblock %}

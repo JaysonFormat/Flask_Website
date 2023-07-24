@@ -22,6 +22,9 @@ file_handler = logging.FileHandler('audit.log')
 file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 
+from project.errors.handlers import errors
+app.register_blueprint(errors)
+
 app.config['MAIL_SERVER']='smtp.googlemail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') 

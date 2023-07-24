@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+
+<div class=" container mt-5" ></div>
+<div class=" text-center mt-5 ">
+	<h1 style="font-size: 110px;" > <b>Successful Payment!</b></h1>
+	<p style="font-size:18px">Your appointment has been booked. A receipt will be sent to your email or SMS </p>
+	<a class="btn btn-outline-success" href="{{ url_for('history') }}" > My Appointments </a>
+</div>
+
+
+
+
+{% endblock %}

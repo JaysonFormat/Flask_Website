@@ -2,10 +2,11 @@ import secrets
 import os
 import io
 import smtplib
-from project.utility import remove_unused_images
+import requests
+from project.utility import remove_unused_images,parse_price
 from flask_mail import Message, Mail
 from PIL import Image
-from flask import render_template, request, url_for, flash, redirect, send_file,session, send_from_directory, current_app
+from flask import render_template, request, url_for, flash, redirect, send_file,session, send_from_directory, current_app, session, jsonify, abort
 from project import app, db, bcrypt, mail
 from project.forms import (
     RegistrationForm, LoginForm, UpdateAccountForm, AppointmentForm, 
@@ -17,6 +18,26 @@ from datetime import datetime, time, timedelta,date
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_, func, extract
 from openpyxl.utils import get_column_letter
+from functools import wraps
+from flask import abort
+from flask_login import current_user
+
+
+#Any happens bad ni update ko sa latest version 2.3.X from 2.2.2
+        #Ni update ko sa 2.2.5
+#Updating Flask_WTF from 1.0.1 to updated to fix the AttributeError: module 'flask.json' has no attribute 'JSONEncoder' (Fix for now)
+        #Rollback ko sa previous version 1.0.1
+
+
+def deny_customer_staff(f):     #REMOVE @deny_customer_staff sa mga route if may error encountered
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check if the user's role is either "Customer" or "Staff"
+        if current_user.role in ["Customer", "Staff"]:
+            abort(403)  # Raise a 403 Forbidden error if the user has one of the restricted roles
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @app.route('/')  # HOME PAGE
@@ -143,13 +164,13 @@ def booking():
     return render_template('book.html', title='Booking', form=form)
 
 
-
 @app.route('/book', methods=['GET', 'POST'])
 def book_appointment():
     form = AppointmentForm()
     if form.validate_on_submit():
         branch = form.branch.data
         service = form.service.data
+        price = parse_price(service)
         service2 = form.service2.data
         service3 = form.service3.data
         date = form.date.data
@@ -157,26 +178,136 @@ def book_appointment():
         # Create a new instance of the Book_date model
         appointment = Book_date(branch=branch, service=service, service2=service2, service3=service3, date=date, user_id=current_user.user_id)
 
-        # Add the new instance to the database and commit changes
-        flash(f'Congratulations for creating an appointment check "MyAppointments" ', 'success')
-
         if 'submit_another' in request.form: # Mag add if yung customer accident click submit and return
 
-            # success_book = AuditTrail(user_id=current_user.user_id, event_type='Success Book', event_description='successfully book')
-            # db.session.add(success_book)
-            db.session.add(appointment)
-            appointment.is_paid = True
-            db.session.commit()
+            # Store the form data in the session
+            session['form_data'] = {
+                'branch': branch,
+                'service': service,
+                'price': price,
+                'date': date,
+                'service2': service2,
+                'service3': service3
+            }
+
+            # appointment.is_paid = True
+            return redirect(url_for('checkout', service=service, price=price, date=date, branch=branch)) # user_id=current_user.user_id ADD USER SA CHECKOUT
 
         else:
+            flash(f'Congratulations for creating an appointment check "MyAppointments" ', 'success')
             db.session.add(appointment)
             db.session.commit()
-            
-        # Redirect to a success page
-        return redirect(url_for('book_appointment'))
+        
+            # Redirect to a success page
+            return redirect(url_for('book_appointment'))
 
     return render_template('book.html',title='Booking', form=form)
 
+
+@app.route('/checkout/')
+def checkout():
+        # ADD USER SA CHECKOUT
+        selected_branch = request.args.get('branch')
+        selected_service = request.args.get('service')
+        amount = request.args.get('price')
+        date_obj = datetime.strptime(request.args.get('date'), '%Y-%m-%d %H:%M:%S') # Convert date string to datetime object
+        formatted_date = date_obj.strftime('%B %d, %Y %I:%M %p') 
+
+        return render_template('checkout.html', title='Checkout', selected_service=selected_service, amount=amount, date=formatted_date, selected_branch=selected_branch)
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    # Retrieve necessary data for the payment from the request body
+    amount = int(request.json['amount']) * 100  # Convert price to cents
+    currency = 'PHP'
+    description = request.json['description']
+    quantity = 1
+
+    # Make a POST request to the PayMongo API to create the Checkout Session
+    url = 'https://api.paymongo.com/v1/checkout_sessions'
+    payload = {
+        "data": {
+            "attributes": {
+                "line_items": [
+                    {
+                        "currency": "PHP",
+                        "amount": amount,
+                        "name": "Product",
+                        "quantity": quantity,
+                        "description": description
+                    }
+                ],
+                "payment_method_types": ["dob_ubp","dob","card", "gcash","paymaya",],
+                "send_email_receipt": True,
+                "show_description": True,
+                "show_line_items": True,
+                "description": description,
+                "cancel_url": "http://localhost:5000/book/", # Change it back if using deployment url
+                "success_url": "http://localhost:5000/payment-success/" # Change it back if using deployment url 
+            }
+        }
+    }
+
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Basic c2tfdGVzdF9BS05rWEtGTlBubW0yVFl5R2VEQnhkdGg6"  # Replace with your actual authorization header This is testing (Change REAL API)
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    data = response.json()
+
+    # Retrieve the checkout_url from the response
+    checkout_url = data['data']['attributes']['checkout_url']
+
+    # Add the checkout_url to the response data
+    data['checkout_url'] = checkout_url
+
+    # Return the response data as JSON
+    return jsonify(data)
+
+
+#sk_test_AKNkXKFNPnmm2TYyGeDBxdth pk_test_KfYzcPSKD92k7YQSwXGPiGva Testing_keys
+
+@app.route('/payment-success/', methods=['POST','GET'])
+def payment_success():
+    # Retrieve the form data from the session
+    form_data = session.get('form_data')
+
+    if form_data:
+        # Extract the relevant data from the form_data dictionary
+        branch = form_data['branch']
+        price = form_data['price']
+        date = form_data['date']
+        service = form_data['service']
+        service2 = form_data['service2']
+        service3 = form_data['service3']
+
+        # print(branch)
+        # print(price)
+        # print(date)
+        # print(service)
+        
+        # ... Rest of your code to process the payment success ...
+
+        # Clear the form data from the session after processing
+        session.pop('form_data', None)
+
+        # Create a new instance of the Book_date model
+        appointment = Book_date(branch=branch, service=service, service2=service2, service3=service3, date=date, user_id=current_user.user_id)
+
+        # Mark the appointment as paid
+        appointment.is_paid = True
+
+        #Commit the appointment to the database
+        db.session.add(appointment)
+        db.session.commit()
+
+        # Redirect or render a success page
+        return render_template('payment_successful_complete.html', title="Success")
+
+    # Redirect to an error page if form_data is not found in the session
+    abort (404)
 
 
 @app.route('/myappointment/')  # myappointments PAGE
@@ -271,6 +402,7 @@ def update_password():
     return render_template('user_update_password.html',title='Update Password', form=form)
 
 @app.route('/adminpage/', methods=['GET','POST'])  # Admin Dashboard
+@deny_customer_staff
 @login_required
 def adminpage():
     employee_acc = User.query.filter(User.role.in_(['Admin', 'Super_admin'])).all()
@@ -301,7 +433,9 @@ def adminpage():
 
         #num_employee=num_employee, emp_activate=emp_activate, emp_deactivate=emp_deactivate,employee_acc=employee_acc
 
-@app.route('/usermanagement', methods=['GET'])
+@app.route('/usermanagement/', methods=['GET'])
+@login_required
+@deny_customer_staff
 def usermanagement():
     form = RegistrationForm()
     page = request.args.get('page', 1, type=int)
@@ -309,6 +443,7 @@ def usermanagement():
     return render_template('usermanagement.html', title='Customer', users=users, form=form)
 
 @app.route('/deactivate-user', methods=['POST'])
+@deny_customer_staff
 @login_required
 def deactivate():
     email = request.form['email']
@@ -328,6 +463,7 @@ def deactivate():
 
 
 @app.route('/activate-user', methods=['POST'])
+@deny_customer_staff
 @login_required
 def activate():
     email = request.form['email']
@@ -343,6 +479,7 @@ def activate():
     return redirect(url_for('usermanagement'))
 
 @app.route('/edit-user/<int:user_id>', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def edit_user(user_id):
     form = EditUserForm()
@@ -373,6 +510,7 @@ def edit_user(user_id):
     return render_template('edit_user.html', form=form,title='Edit User', user_id=user_id)
 
 @app.route('/user_changepass/<int:user_id>', methods=['GET', 'POST'])
+@deny_customer_staff
 def user_changepass(user_id):
     form = UpdatePasswordForm()
 
@@ -394,6 +532,7 @@ def user_changepass(user_id):
     return render_template('user_changepass.html', form=form,title='User Password', user=user, user_id=user_id)  
 
 @app.route('/create-user', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def create_user():
     # if current_user.is_authenticated:
@@ -416,7 +555,9 @@ def create_user():
     return render_template('admin_create_user.html', form=form)
 
 
-@app.route('/appointment_management', methods=['GET','POST'])  # Appointment Management
+@app.route('/appointment_management/', methods=['GET','POST'])  # Appointment Management
+@deny_customer_staff
+@login_required
 def app_management():
     form = AppointmentForm()
     page = request.args.get('page', 1, type=int)
@@ -425,6 +566,8 @@ def app_management():
     return render_template('appointment_management.html',title='Appointment Management', form=form, appointments=appointments)
 
 @app.route('/book_admin', methods=['GET', 'POST'])
+@deny_customer_staff
+@login_required
 def app_management_book():
     form = AppointmentForm()
 
@@ -454,6 +597,7 @@ def app_management_book():
 
 
 @app.route('/appointment_admin/<int:id>', methods=['POST'])
+@deny_customer_staff
 def app_management_done(id):
     appointment = Book_date.query.get_or_404(id)
     appointment.is_done = True
@@ -466,6 +610,7 @@ def app_management_done(id):
     return redirect(url_for('app_management'))
 
 @app.route('/download_appointments')
+@deny_customer_staff
 def download_appointments():
     # Get the appointments from the database
     appointments = Book_date.query.all()
@@ -502,6 +647,7 @@ def download_appointments():
 
 
 @app.route('/activate_download')
+@deny_customer_staff
 def download_users():
     # Get the users from the database
     users = User.query.filter_by(role='Customer').all()
@@ -541,6 +687,7 @@ def download_users():
 
 
 @app.route('/logging') # audit page
+@deny_customer_staff
 def audit_trail():
     month = request.args.get('month')
     page = request.args.get('page', 1, type=int)
@@ -554,9 +701,8 @@ def audit_trail():
     return render_template('audit_trail.html',title='Audit Trail', user=user, logs=logs)
 
 
-
-
 @app.route('/logs_download')
+@deny_customer_staff
 @login_required
 def download_logs():
 
@@ -597,6 +743,7 @@ def download_logs():
     return send_file(output, download_name='logs_records.xlsx', as_attachment=True, )
 
 @app.route('/customer_search', methods=['GET', 'POST'])
+@deny_customer_staff
 def customer_search():
     form = RegistrationForm()
     search_term = request.form.get('lname')
@@ -621,6 +768,7 @@ def customer_search():
 
 
 @app.route('/appointment_search', methods=['GET', 'POST'])
+@deny_customer_staff
 def appointment_search():
     form = AppointmentForm()
     search_term = request.form.get('lname')
@@ -647,6 +795,7 @@ def appointment_search():
 
 
 @app.route('/inventory', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def inventory():
     form = InventoryForm()
@@ -656,6 +805,7 @@ def inventory():
 
 
 @app.route('/inventory_create', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def inventory_create():
     form = InventoryForm()
@@ -676,6 +826,7 @@ def inventory_create():
     return render_template('inventory_create.html',title='Inventory', form=form)
 
 @app.route('/inventory_edit/<int:inventory_id>', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def inventory_edit(inventory_id):
     form = InventoryForm()
@@ -707,6 +858,7 @@ def inventory_edit(inventory_id):
 
 
 @app.route('/product_download')
+@deny_customer_staff
 @login_required
 def download_inventory():
 
@@ -748,6 +900,7 @@ def download_inventory():
 
 
 @app.route('/delete_product', methods=['POST'])
+@deny_customer_staff
 @login_required
 def delete_product():
     product = request.form['product']
@@ -763,6 +916,7 @@ def delete_product():
     return redirect(url_for('inventory'))
 
 @app.route('/inventory_search', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def inventory_search():
     form = InventoryForm()
@@ -784,6 +938,7 @@ def inventory_search():
     return render_template('inventory_management.html',title='Inventory', inventory=inventory, form=form)
 
 @app.route('/account_admin/', methods=['GET', 'POST'])  # account admin PAGE
+@deny_customer_staff
 @login_required
 def account_admin():
     form = UpdateAccountForm()
@@ -821,6 +976,7 @@ def account_admin():
     return render_template('account_admin.html', title='Account', image_file=image_file, form=form)
 
 @app.route('/update_password_admin', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def update_password_admin():
     form = UpdatePasswordForm()
@@ -849,6 +1005,7 @@ def update_password_admin():
 
 
 @app.route('/employee_management', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def employee_management():
     form = EmployeeForm()
@@ -859,6 +1016,7 @@ def employee_management():
 
 
 @app.route('/employee_create', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def employee_create():
     form = EmployeeForm()
@@ -888,6 +1046,7 @@ def employee_create():
     return render_template('employee_create.html', form=form)
 
 @app.route('/deactivate-employee', methods=['POST'])
+@deny_customer_staff
 @login_required
 def deactivate_employee():
     email = request.form['email']
@@ -905,6 +1064,7 @@ def deactivate_employee():
 
 # CREATE A ACTIVATE ACCOUNT KAGAYA SA USERMANAGEMENT
 @app.route('/activate-employee', methods=['POST'])
+@deny_customer_staff
 @login_required
 def activate_employee():
     email = request.form['email']
@@ -920,6 +1080,7 @@ def activate_employee():
     return redirect(url_for('employee_management'))
 
 @app.route('/download_employee')
+@deny_customer_staff
 @login_required
 def download_employee():
     # Get the appointments from the database
@@ -957,6 +1118,7 @@ def download_employee():
     return send_file(output, download_name='employee_record.xlsx', as_attachment=True)
 
 @app.route('/employee_search', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def employee_search():
     form = EmployeeForm()
@@ -981,6 +1143,7 @@ def employee_search():
 
 
 @app.route('/employee_account/<int:user_id>', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def employee_account(user_id):
     form = UpdateEmployee()
@@ -1030,6 +1193,7 @@ def employee_account(user_id):
 
 
 @app.route('/download_document/<path:file_pdf>', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def download_documents(file_pdf):
     directory = app.config['UPLOAD_FOLDER']
@@ -1037,6 +1201,7 @@ def download_documents(file_pdf):
 
 
 @app.route('/update_password_employee/<int:user_id>', methods=['GET','POST'])
+@deny_customer_staff
 @login_required
 def update_password_employee(user_id):
     form = UpdatePasswordForm()
@@ -1102,14 +1267,17 @@ def reset_token(token):
 
 
 @app.route("/payments/", methods=['GET', 'POST'])
+@deny_customer_staff
+@login_required
 def payments():
     page = request.args.get('page', 1, type=int)
     payments = Book_date.query.filter_by(is_paid=True).order_by(Book_date.book_id.desc()).paginate(page=page, per_page=5)
     user = User.query.all()
-    return render_template('payments.html',title='Payments', user=user, payments=payments)
+    return render_template('payments.html',title='Payments', user=user,payments=payments)
 
 
 @app.route('/payment_search', methods=['GET', 'POST'])
+@deny_customer_staff
 def payment_search():
     form = AppointmentForm()
     search_term = request.form.get('lname')
@@ -1136,6 +1304,7 @@ def payment_search():
 
 
 @app.route('/download_payments', methods=['GET','POST'])
+@deny_customer_staff
 def download_payments():
     roles = ['Super_admin', 'Staff', 'Admin']
     book_payment = Book_date.query.all()
@@ -1147,7 +1316,7 @@ def download_payments():
     ws = wb.active
 
     # Add headers to the worksheet
-    ws.append(['Last Name', 'Email','Contact', 'Address', 'Paid'])
+    ws.append(['Last Name','Service','Branch', 'Email','Contact', 'Address', 'Paid'])
 
     # Set the width of each column
     for col_index in range(1, 6):
@@ -1156,7 +1325,7 @@ def download_payments():
 
     # Add data to the worksheet
     for book in book_payment:
-        ws.append([book.user.lname, book.user.email, book.user.contact, book.user.address, book.is_paid])
+        ws.append([book.user.lname,book.service,book.branch, book.user.email, book.user.contact, book.user.address, book.is_paid])
 
     # Save the workbook to a BytesIO object
     output = io.BytesIO()
@@ -1172,6 +1341,7 @@ def download_payments():
     return send_file(output, download_name='payments_record.xlsx', as_attachment=True)
 
 @app.route('/attendance')
+@deny_customer_staff
 @login_required
 def attendance():
     form = AppointmentForm()
@@ -1181,6 +1351,7 @@ def attendance():
 
 
 @app.route('/attendance_search', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def attendance_search():
     form = AttendanceForm()  # Create an instance of the AttendanceForm
@@ -1281,6 +1452,7 @@ def time_out():
 
 @app.route('/download_attendance') 
 @login_required
+@deny_customer_staff
 def download_attendance():
     # Get the attendance from the database
     attendance = Attendance.query.all()
@@ -1344,6 +1516,7 @@ def calculate_gross_and_net_pay(total_hours, total_overtime, payrate, tax):
     return gross_pay, net_pay
 
 @app.route('/payroll/<int:user_id>', methods=['GET', 'POST'])
+@deny_customer_staff
 @login_required
 def payroll(user_id):
     form = PayrollForm()
@@ -1398,6 +1571,7 @@ def payroll(user_id):
 
 
 @app.route('/download_payroll/<int:user_id>', methods=["GET","POST"])
+@deny_customer_staff
 @login_required
 def download_payroll(user_id):
     # Get the specific payroll from the database

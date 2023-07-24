@@ -31,4 +31,4 @@ if __name__ == '__main__':
     scheduler.add_job(func=delete_inactive_accounts, trigger='cron', hour=0, minute=0)
     # scheduler.add_job(id='delete_inactive_accounts', func=delete_inactive_accounts, trigger='interval', seconds = 5)
     scheduler.start()
-    app.run(debug=True)
+    app.run(debug=True) #Don't Forget to turn off
