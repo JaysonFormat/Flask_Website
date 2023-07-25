@@ -8,3 +8,4 @@
 # Don't forget to change the file size accepted in nginx
 - client_max_body_size 8M;
 # Don't Forger to change the timezone in linux Asia/Manila
+# Don't Forget to change the API keys and payment_successful redirects 
