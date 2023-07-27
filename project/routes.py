@@ -1473,7 +1473,7 @@ def download_attendance():
 
     # Add data to the worksheet
     for attendance in attendance:
-        ws.append([attendance.user.fname, attendance.user.lname, attendance.user.role, attendance.time_in.strftime('%Y-%m-%d %I:%M:%S %p'), attendance.time_out.strftime('%Y-%m-%d %I:%M:%S %p')])
+        ws.append([attendance.user.fname, attendance.user.lname, attendance.user.role, attendance.time_in.strftime('%Y-%m-%d %I:%M:%S %p') if attendance.time_in else "", attendance.time_out.strftime('%Y-%m-%d %I:%M:%S %p') if attendance.time_out else ""])
 
     # Save the workbook to a BytesIO object
     output = io.BytesIO()
