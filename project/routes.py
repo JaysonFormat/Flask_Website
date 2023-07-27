@@ -1168,10 +1168,11 @@ def employee_account(user_id):
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             employee.filename = filename
 
-        if form.role.data == "Admin":
-            employee.is_admin = True
-        else:
-            employee.is_admin = False
+        if employee is not None:
+            if form.role.data in ["Admin", "Super_admin"]:
+                employee.is_admin = True
+            else:
+                employee.is_admin = False
 
         db.session.commit()
 
