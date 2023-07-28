@@ -37,7 +37,7 @@ def deny_customer_staff(f):     #REMOVE @deny_customer_staff sa mga route if may
             abort(403)  # Raise a 403 Forbidden error if the user has one of the restricted roles
         return f(*args, **kwargs)
 
-    return decorated_function
+    return decorated_function # Mag add for Admins naman for specific routes
 
 
 @app.route('/')  # HOME PAGE
@@ -251,8 +251,9 @@ def create_checkout_session():
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": "Basic c2tfdGVzdF9BS05rWEtGTlBubW0yVFl5R2VEQnhkdGg6"  # Replace with your actual authorization header This is testing (Change REAL API)
+        "Authorization": "Basic c2tfbGl2ZV9zYkMxUFNVM2M3RlRCRDVtcUd0QkdTNnM6"  # REAL API
     }
+
 
     response = requests.post(url, json=payload, headers=headers)
     data = response.json()
