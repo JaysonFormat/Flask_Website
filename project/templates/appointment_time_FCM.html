@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class=" container content-section mt-5">
+    <h1 class="fw-bold text-center "> Slots Available &#x1F4C5</h1>
+
+    <form action="{{ url_for('app_time_fcm') }}" method="get">
+        <p class="text-center fw-bold fs-4">FCM Branch <input type="date" name="date1">
+            <button class="ms-2 mb-2 btn btn-outline-primary" type="submit">Filter</button>
+        </p>
+    </form>
+
+    <br>
+    <div class="container text-center ">
+        <div class="row row-cols-2 row-cols-lg-3 g-2 g-lg-3">
+            {% for start_time, end_time, slot_available_count in available_slots %}
+                <div class="col">
+                    <div class="p-2 border border-dark rounded-3">
+                        <h5>{{ start_time.strftime('%I:%M %p') }} - {{ end_time.strftime('%I:%M %p') }}:</h5>
+                        <strong class="fs-4" >
+                            {{ slot_available_count }} Slot Available
+                        </strong>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <br>
+    <div class="text-center" >
+    <a class="btn btn-outline-success fs-4 me-2" href="{{ url_for('book_appointment') }}"> Book an Appointment </a>
+    <a class="btn btn-outline-primary fs-4" href="{{ url_for('app_time_zap') }}"> Zapote Branch </a>
+    </div>
+</div>
+
+
+{% endblock %}

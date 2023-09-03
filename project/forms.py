@@ -150,9 +150,10 @@ class AppointmentForm(FlaskForm):
         ,('30 Mins FootReflex','30 mins FootReflex'),('1 Hour FootReflex','1 Hour Footreflex'),('Ear Candle Only','Ear Candle Only'),('Ear Candle with Massage','Ear Candle with Massage'),('1 1/2 Hour Body Scrub with Massage','1 1/2 Hour Body Scrub with Massage'),('2 Hours Body Scrube with Massage','2 Hours Body Scrube with Massage'),('',''),('Whitening','Whitening'),('Waxing Underarm','Waxing Underarm')
         ,('Waxing Legs','Waxing Legs'),('Waxing Bikini','Waxing Bikini'),('Eyelash Extension','Eyelash Extension'),('Eyelash Firming','Eyelash Firming'),('Eyebrow Threading','Eyebrow Threading'),('Eyebrow Shaving','Eyebrow Shaving'),('Traditional Hair & Make-up','Traditional Hair & Make-up'),('Air Brush Make-up','Air Brush Make-up')])
 
+    date = DateTimeLocalField('Appointment Date & Time',format='%Y-%m-%dT%H:%M',validators=[DataRequired()] )
 
     start_time = time(hour=8, minute=0)
-    end_time = time(hour=17, minute=0)
+    end_time = time(hour=19, minute=0)
 
     # minimum date is tomorrow
     min_date = datetime.now().date() + timedelta(days=1)
@@ -164,14 +165,14 @@ class AppointmentForm(FlaskForm):
     min_time = datetime.combine(min_date, start_time)
     max_time = datetime.combine(min_date, end_time)
 
-    date = DateTimeLocalField('Appointment Date & Time', 
-        format='%Y-%m-%dT%H:%M', 
-        validators=[DataRequired()], 
-        default=min_time, 
-        render_kw={'min': min_time.strftime('%Y-%m-%dT%H:%M'), 
-                            'max': max_time.combine(max_date, end_time).strftime('%Y-%m-%dT%H:%M'), 
-            }
-        )
+    # date = DateTimeLocalField('Appointment Date & Time', 
+    #     format='%Y-%m-%dT%H:%M', 
+    #     validators=[DataRequired()], 
+    #     default=min_time, 
+    #     render_kw={'min': min_time.strftime('%Y-%m-%dT%H:%M'), 
+    #                         'max': max_time.combine(max_date, end_time).strftime('%Y-%m-%dT%H:%M'), 
+    #         }
+    #     )
       
     submit = SubmitField('Book')
 

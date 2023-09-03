@@ -158,10 +158,155 @@ def terms_and_conditions():
 def service():
     return render_template('service.html', title='Service')
 
+@app.route('/FAQ/')
+def FAQ():
+    return render_template('FAQ.html', title='FAQ')
+
 @app.route('/book/')  # Booking PAGE
 def booking():
     form = AppointmentForm()
     return render_template('book.html', title='Booking', form=form)
+
+@app.route('/appointment_time_zapote/', methods=['GET', 'POST']) #Calendar Appointment zapote
+def app_time_zap():
+    date = request.args.get('date')
+
+    if date:
+        selected_date = datetime.strptime(date, '%Y-%m-%d').date()
+        oras = Book_date.query.filter_by(branch='Zapote').with_entities(Book_date.date).all()
+        
+        date_values = [datetime_obj.date() for datetime_obj, in oras]
+        time_values = [datetime_obj.time() for datetime_obj, in oras]
+        
+        matching_dates = [(date, time) for date, time in zip(date_values, time_values) if date == selected_date]
+        #print(matching_dates)
+
+        # Define time slot ranges
+        time_slots = [
+            (time(8, 0), time(8, 59)),
+            (time(9, 0), time(9, 59)),
+            (time(10, 0), time(10, 59)),
+            (time(11, 0), time(11, 59)),
+            (time(12, 0), time(12, 59)),  # 12pm - 1pm
+            (time(13, 0), time(13, 59)),  # 1pm - 2pm
+            (time(14, 0), time(14, 59)),  # 2pm - 3pm
+            (time(15, 0), time(15, 59)),  # 3pm - 4pm
+            (time(16, 0), time(16, 59)),  # 4pm - 5pm
+            (time(17, 0), time(17, 59)),  # 5pm - 6pm
+            (time(18, 0), time(18, 59)),  # 6pm - 7pm
+        ]
+
+        available_slots = []  # Initialize the list here
+
+        for start_time, end_time in time_slots:
+            slot_available_count = 10  # Initialize slot count for each time slot
+            for matching_date, matching_time in matching_dates:
+                if start_time <= matching_time <= end_time:
+                    #print('decrement')
+                    slot_available_count = slot_available_count - 1
+            
+            available_slots.append((start_time, end_time, slot_available_count))  # Append tuple with slot count
+
+        return render_template('appointment_time_zapote.html', title='Appointment Time', available_slots=available_slots)
+    else:
+        flash("Before checking the Available Slots you must choose a date", 'warning')
+
+    return render_template('appointment_time_zapote.html', title='Appointment Time')
+
+
+@app.route('/appointment_time_FCM/', methods=['GET', 'POST']) #Calendar Appointment FCM
+def app_time_fcm():
+    date1 = request.args.get('date1')
+
+    if date1:
+        selected_date = datetime.strptime(date1, '%Y-%m-%d').date()
+        oras = Book_date.query.filter_by(branch='FCM').with_entities(Book_date.date).all()
+        
+        date_values = [datetime_obj.date() for datetime_obj, in oras]
+        time_values = [datetime_obj.time() for datetime_obj, in oras]
+        
+        matching_dates = [(date, time) for date, time in zip(date_values, time_values) if date == selected_date]
+        #print(matching_dates)
+
+        # Define time slot ranges
+        time_slots = [
+            (time(8, 0), time(8, 59)),
+            (time(9, 0), time(9, 59)),
+            (time(10, 0), time(10, 59)),
+            (time(11, 0), time(11, 59)),
+            (time(12, 0), time(12, 59)),  # 12pm - 1pm
+            (time(13, 0), time(13, 59)),  # 1pm - 2pm
+            (time(14, 0), time(14, 59)),  # 2pm - 3pm
+            (time(15, 0), time(15, 59)),  # 3pm - 4pm
+            (time(16, 0), time(16, 59)),  # 4pm - 5pm
+            (time(17, 0), time(17, 59)),  # 5pm - 6pm
+            (time(18, 0), time(18, 59)),  # 6pm - 7pm
+        ]
+
+        available_slots = []  # Initialize the list here
+
+        for start_time, end_time in time_slots:
+            slot_available_count = 10  # Initialize slot count for each time slot
+            for matching_date, matching_time in matching_dates:
+                if start_time <= matching_time <= end_time:
+                    #print('decrement')
+                    slot_available_count = slot_available_count - 1
+            
+            available_slots.append((start_time, end_time, slot_available_count))  # Append tuple with slot count
+
+        return render_template('appointment_time_FCM.html', title='Appointment Time', available_slots=available_slots)
+
+    else:
+        flash("Before checking the Available Slots you must choose a date", 'warning')
+
+    return render_template('appointment_time_FCM.html', title='Appointment Time')
+
+
+def check_available_slots(branch, selected_date):
+    date_query = Book_date.query.filter_by(branch=branch).with_entities(Book_date.date).all()
+
+    selected_time = selected_date.time()  # Extract the time component from selected_date
+    selected_datetime = datetime.combine(selected_date.date(), selected_time)
+
+    filtered_date_values = [date[0] for date in date_query if date[0].date() == selected_datetime.date()]
+
+    # Define time slot ranges
+    time_slots = [
+        (time(8, 0), time(8, 59)),
+        (time(9, 0), time(9, 59)),
+        (time(10, 0), time(10, 59)),
+        (time(11, 0), time(11, 59)),
+        (time(12, 0), time(12, 59)),  # 12pm - 1pm
+        (time(13, 0), time(13, 59)),  # 1pm - 2pm
+        (time(14, 0), time(14, 59)),  # 2pm - 3pm
+        (time(15, 0), time(15, 59)),  # 3pm - 4pm
+        (time(16, 0), time(16, 59)),  # 4pm - 5pm
+        (time(17, 0), time(17, 59)),  # 5pm - 6pm
+        (time(18, 0), time(18, 59)),  # 6pm - 7pm
+    ]
+
+    # Calculate the time slot for the selected_datetime
+    selected_time = selected_datetime.time()
+    selected_time_slot = None
+    for start_time, end_time in time_slots:
+        if start_time <= selected_time <= end_time:
+            selected_time_slot = (start_time, end_time)
+            break
+
+    if selected_time_slot is None:
+        # Handle the case where the selected_time is not within any time slot
+        return -1  # Invalid time slot
+
+    # Initialize slot_available_count for the selected time slot
+    slot_available_count = 10
+
+    # Decrement slot_available_count based on existing appointments at the selected time
+    for matching_datetime in filtered_date_values:
+        matching_time = matching_datetime.time()
+        if selected_time_slot[0] <= matching_time <= selected_time_slot[1]:
+            slot_available_count -= 1
+
+    return slot_available_count
 
 
 @app.route('/book', methods=['GET', 'POST'])
@@ -177,6 +322,15 @@ def book_appointment():
 
         # Create a new instance of the Book_date model
         appointment = Book_date(branch=branch, service=service, service2=service2, service3=service3, date=date, user_id=current_user.user_id)
+
+        selected_date = date
+        slot_available_count = check_available_slots(branch, selected_date=selected_date)  # Get the available slots count
+
+        print(slot_available_count)
+
+        if slot_available_count == 0:
+            flash(f'Cannot book on that date. No slots available. Please check the available slots', 'danger')
+            return redirect(url_for('book_appointment'))
 
         if 'submit_another' in request.form: # Mag add if yung customer accident click submit and return
 
@@ -195,13 +349,15 @@ def book_appointment():
 
         else:
             flash(f'Congratulations for creating an appointment check "MyAppointments" ', 'success')
-            db.session.add(appointment)
-            db.session.commit()
+            # db.session.add(appointment)
+            # db.session.commit()
         
             # Redirect to a success page
             return redirect(url_for('book_appointment'))
 
     return render_template('book.html',title='Booking', form=form)
+
+
 
 
 @app.route('/checkout/')
@@ -251,9 +407,11 @@ def create_checkout_session():
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": "Basic c2tfbGl2ZV9zYkMxUFNVM2M3RlRCRDVtcUd0QkdTNnM6"  # REAL API
+        "Authorization": "Basic c2tfdGVzdF9BS05rWEtGTlBubW0yVFl5R2VEQnhkdGg6"  # Not real api
     }
 
+
+#Basic c2tfdGVzdF9BS05rWEtGTlBubW0yVFl5R2VEQnhkdGg6 not real
 
     response = requests.post(url, json=payload, headers=headers)
     data = response.json()
@@ -411,9 +569,9 @@ def adminpage():
     num_activate = len(User.query.filter(User.is_active == True, User.role == 'Customer').all())
     num_deactivate = len(User.query.filter(User.is_active == False, User.role == 'Customer').all())
     num_appointment = len(Book_date.query.filter_by(is_done=False).all())
-    num_employee = len(User.query.filter(User.role.in_(['Admin', 'Super_admin'])).all())
-    emp_activate = len(User.query.filter(or_(User.role=='Admin', User.role=='Super_admin'), User.is_active==True).all())
-    emp_deactivate = len(User.query.filter(or_(User.role=='Admin', User.role=='Super_admin'), User.is_active==False).all())
+    num_employee = len(User.query.filter(User.role.in_(['Admin', 'Super_admin','Staff'])).all())
+    emp_activate = len(User.query.filter(or_(User.role=='Admin', User.role=='Super_admin', User.role=='Staff'), User.is_active==True).all())
+    emp_deactivate = len(User.query.filter(or_(User.role=='Admin', User.role=='Super_admin', User.role=='Staff'), User.is_active==False).all())
     num_products = len(Inventory.query.all())
     inventory = Inventory.query.all()  # get all inventory items
 
@@ -1230,6 +1388,7 @@ def send_reset_email(user):
 
     with open(os.path.join(os.path.dirname(__file__), 'reset_password.txt')) as file:
             message_body = file.read()
+
 
     reset_token = message_body.format(url_for('reset_token', token=token, _external=True))
     msg.body = reset_token

@@ -3,14 +3,18 @@
   <div class="position-relative">
     <div class="min-vh-50">
       <div class="content-section container-md mt-5">
-        <h1 class="my-2">Book an Appointment</h1>
+        <h1 class="my-2 fw-bold " style="font-family: 'Satisfy', cursive;" >Book an Appointment</h1>
+        <ul>
+        <li>Tips in booking an appointment check our <a href="{{ url_for('FAQ') }}">FAQ</a></li>
+        <li>The Salon accepts appointments between 8:00 am and 7:00 pm only</li>
+        </ul>
         <br>
         <form method="POST" action="{{ url_for('book_appointment') }}" >
           {{ form.csrf_token }}
           {{ form.hidden_tag() }}
           <div class="form-group row">
             <div class="col-sm-2">
-              {{ form.branch.label(class='form-label') }}
+              <strong>{{ form.branch.label(class='form-label') }}</strong>
             </div>
             <div class="col-sm-7">
               {{ form.branch(class='form-control') }}
@@ -26,7 +30,7 @@
           <br>
           <div class="form-group row">
             <div class="col-sm-2">
-              {{ form.service.label(class='form-label') }}
+              <strong>{{ form.service.label(class='form-label') }}</strong>
             </div>
             <div class="col-sm-7">
               {{ form.service(class='form-control') }}
@@ -42,7 +46,7 @@
           <br>
           <div class="form-group row">
             <div class="col-sm-2">
-              {{ form.service2.label(class='form-label') }}
+              <strong>{{ form.service2.label(class='form-label') }}</strong>
             </div>
             <div class="col-sm-7">
               {% if form.service2.errors %}
@@ -61,7 +65,7 @@
           <br>
           <div class="form-group row">
             <div class="col-sm-2">
-              {{ form.service3.label(class='form-label') }}
+              <strong>{{ form.service3.label(class='form-label') }}</strong>
             </div>
             <div class="col-sm-7">
               {{ form.service3(id='service3',class='form-control') }}
@@ -78,11 +82,12 @@
 
           <div class="form-group row">
             <div class="col-sm-2">
-              {{ form.date.label(class='form-label') }}
+              <strong>{{ form.date.label(class='form-label') }}</strong>
             </div>
             <div class="col-sm-7">
               {{ form.date(class='form-control', type="datetime-local") }}
-              The Salon accepts appointments between 8:00 am and 5:00 pm only
+              <br>
+              <h6>Check the Available slots <a href="{{ url_for('app_time_zap') }}">here</a></h6>
               {% if form.date.errors %}
                 <ul class="errors">
                   {% for error in form.date.errors %}
@@ -114,6 +119,7 @@
       </div>
     </div>
   </div>
+
   <script>
   const serviceField = document.getElementById('service');
   const service2Field = document.getElementById('service2');

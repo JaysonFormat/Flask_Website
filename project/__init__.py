@@ -42,7 +42,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') #'47bd15adbe24b1d8af0dc8
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
 #'mysql+pymysql://root:root@localhost/flask_db'
-#'mysql+pymysql://root:Jayson$$$21@localhost/flask_db'
+#'mysql+pymysql://galicia:Jayson$$$21@localhost/flask_db'
 #'mysql+pymysql://<username created>:<password>@<hostname>/flask_db'
 #'CREATE ANOTHER USER FOR DATABASE AND GRANT ALL PRIVILEGES
 #'sudo ufw allow http/tcp'

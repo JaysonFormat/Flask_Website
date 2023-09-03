@@ -30,7 +30,7 @@ def remove_unused_images():
 
 def parse_price(choice):
     prices = {
-            'Haircut with Style': 150,
+            'Haircut with Style': 25,
             'Haircut Trim': 100,
             'Manicure': 100,
             'Pedicure': 100,
